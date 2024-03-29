@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesame Market Information</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Filter the Sesame Market Information</h1>
+    <form id="filterForm">
+        <label for="filter">Filter by Symbol or Warehouse:</label>
+        <input type="text" id="filter" name="filter">
+        <button type="submit">Filter</button>
+    </form>
+    <br>
+    <div id="data"></div>
+
+    <script>
+        document.getElementById('filterForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            fetchData();
+        });
+
+        async function fetchData() {
+            const filterValue = document.getElementById('filter').value;
+            let apiUrl = '/api/data';
+            if (filterValue) {
+                apiUrl += `/${filterValue}`;
+            }
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                displayData(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function displayData(data) {
+            const dataTable = document.createElement('table');
+            const headerRow = document.createElement('tr');
+
+            for (const key in data[0]) {
+                const th = document.createElement('th');
+                th.textContent = key;
+                headerRow.appendChild(th);
+            }
+            dataTable.appendChild(headerRow);
+
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                for (const key in item) {
+                    const td = document.createElement('td');
+                    td.textContent = item[key];
+                    row.appendChild(td);
+                }
+                dataTable.appendChild(row);
+            });
+
+            const dataDiv = document.getElementById('data');
+            dataDiv.innerHTML = '';
+            dataDiv.appendChild(dataTable);
+        }
+
+        window.addEventListener('DOMContentLoaded', fetchData);
+    </script>
+</body>
+</html>
